@@ -9,16 +9,34 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "canvas-confetti": "^1.9.2",
+    "clsx": "^2.0.0",
+    "firebase": "^9.23.0",
+    "jotai": "^2.6.0",
+    "nanoid": "^5.0.4",
+    "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.0.4"
+    "react-hotkeys-hook": "^4.4.1",
+    "react-merge-refs": "^2.1.1",
+    "reactfire": "^4.2.3",
+    "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@iconify-json/ph": "^1.1.9",
+    "@swc-jotai/debug-label": "^0.1.0",
+    "@swc-jotai/react-refresh": "^0.1.0",
+    "@types/canvas-confetti": "^1.6.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@unocss/postcss": "^0.58.0",
+    "@unocss/preset-icons": "^0.58.0",
     "eslint": "^8",
-    "eslint-config-next": "14.0.4"
+    "eslint-config-next": "14.0.4",
+    "prettier": "^3.1.1",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "typescript": "^5",
+    "unocss": "^0.58.0"
   }
 }
