@@ -36,6 +36,13 @@ button {
   @apply btn;
 }
 input::placeholder {
-
   @apply "text-gray-900 dark:text-gray-500";
+}
+
+button[type="reset"] {
+  background: none !important;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: inherit;
 }

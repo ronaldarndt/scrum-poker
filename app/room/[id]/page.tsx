@@ -19,20 +19,42 @@ import {
   remove,
   set,
 } from "firebase/database";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import Link from "next/link";
 import { Fragment, useCallback, useEffect } from "react";
 import { useDatabase, useDatabaseObjectData } from "reactfire";
 import styles from "./page.module.css";
 
+import { preferencesAtom } from "@/atoms/preferences";
+import PreferencesButton from "@/components/preferences-button/preferences-button";
+import { Toaster, toast } from "react-hot-toast";
+
 interface Props {
   params: { id: string };
 }
 
-const numbers = [0.5, ...Array.from({ length: 8 }).map((_, i) => fib(i + 2))];
+const numbers = [
+  "i-ph-coffee-bold",
+  0.5,
+  ...Array.from({ length: 8 }).map((_, i) => fib(i + 2)),
+  "i-ph-infinity-bold",
+];
+
+function isIcon(value: string | number | null): value is string {
+  return typeof value === "string" && value.startsWith("i-ph");
+}
+
+function renderVote(value: string | number | null, size = "text-lg") {
+  if (isIcon(value)) {
+    return <div className={clsx(value, size)} />;
+  }
+
+  return value;
+}
 
 export default function Room({ params }: Props) {
-  const [{ id, name }, setUser] = useAtom(userAtom);
+  const [{ id }, setUser] = useAtom(userAtom);
+  const preferences = useAtomValue(preferencesAtom);
 
   const db = useDatabase();
   const { room: getRoomRef } = useRefs();
@@ -41,7 +63,11 @@ export default function Room({ params }: Props) {
 
   const manager = new RoomManager(room.data, roomRef);
 
-  useConfetti({ confetti: room.data?.confetti, onLaunch: handleLaunch });
+  useConfetti({
+    confetti: room.data?.confetti,
+    onLaunch: handleLaunch,
+    enabled: preferences.confetti,
+  });
 
   useGuard(
     () => !room.data?.users || !!room.data.users[id],
@@ -64,6 +90,8 @@ export default function Room({ params }: Props) {
   }, [db, id, params.id]);
 
   useEffect(() => {
+    if (!preferences.confetti) return;
+
     return onValue(child(roomRef, "show"), (snap) => {
       if (!snap.exists() || !snap.val()) return;
 
@@ -83,7 +111,7 @@ export default function Room({ params }: Props) {
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.data?.users?.[id]?.group, id]);
+  }, [room.data?.users?.[id]?.group, id, preferences.confetti]);
 
   const getTitle = useCallback(() => {
     if (!manager.owner) {
@@ -121,6 +149,7 @@ export default function Room({ params }: Props) {
 
   return (
     <div className="flex flex-col h-full justify-between p-8">
+      <Toaster />
       <div className="flex flex-col">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row items-center">
@@ -128,31 +157,57 @@ export default function Room({ params }: Props) {
               <button className="i-ph-arrow-left p-4 me-2" />
             </Link>
             <h1 className="title text">{getTitle()}</h1>
+
+            {!!navigator.clipboard?.writeText ? (
+              <button
+                className="ms-4 flex flex-row text-xs text-gray-600 dark:text-gray-400"
+                onClick={() => {
+                  toast.promise(
+                    navigator.clipboard.writeText(window.location.href),
+                    {
+                      loading: "Copying link...",
+                      success: "Copied!",
+                      error: "Failed to copy",
+                    },
+                    {
+                      position: "bottom-center",
+                    },
+                  );
+                }}
+                type="reset"
+              >
+                Copy link <div className="i-ph-copy ms-1 text-sm" />
+              </button>
+            ) : null}
           </div>
-          <EditableText
-            wrapper={(props) => <p {...props} />}
-            className="text"
-            value={name}
-            onChange={(v) => {
-              setUser((u) => ({ ...u, name: v }));
-              manager.getUserManager(id).setName(v);
-            }}
-          />
+
+          <div className="flex flex-row">
+            <EditableText
+              wrapper={(props) => <p {...props} />}
+              className="text"
+              value={manager.getUser(id)?.name ?? ""}
+              onChange={(v) => {
+                setUser((u) => ({ ...u, name: v }));
+                manager.getUserManager(id).setName(v);
+              }}
+            />
+            <PreferencesButton />
+          </div>
         </div>
         <section className="flex flex-row justify-center mt-16">
           {numbers.map((value) => (
             <div key={value}>
               <button
                 className={clsx(
-                  "btn h[6rem] w[6rem] me-2 position-relative transform-gpu",
-                  "hover:scale-125",
+                  "btn h[6rem] w[6rem] me-2 position-relative transform-gpu flex justify-center items-center",
+                  "hover:scale-125 duration-150 delay-0",
                   "hover:ms-4 hover:me-6 transition-all",
                   styles.button,
                 )}
                 onClick={() => manager.getUserManager(id).setVote(value)}
                 disabled={loading}
               >
-                {value}
+                {renderVote(value, "text-2xl")}
               </button>
             </div>
           ))}
@@ -222,10 +277,17 @@ export default function Room({ params }: Props) {
                 {Object.values(room.data?.users ?? {})
                   .filter((x) => x.group === group.id && x.isOnline)
                   .map((user) => (
-                    <li key={user.id} className="text">
+                    <li
+                      key={user.id}
+                      className="text flex flex-row items-center "
+                    >
                       {user.name} -{" "}
                       <b className="text text-2xl">
-                        {room.data?.show ? user.vote : user.vote ? "?" : ""}
+                        {room.data?.show
+                          ? renderVote(user.vote)
+                          : user.vote
+                            ? "?"
+                            : ""}
                       </b>
                     </li>
                   ))}

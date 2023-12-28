@@ -7,6 +7,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 interface Props {
   onLaunch: (ctx: Confetti) => void;
   confetti?: Record<string, Confetti>;
+  enabled?: boolean;
 }
 
 export default function useConfetti(props: Props) {
@@ -49,12 +50,13 @@ export default function useConfetti(props: Props) {
 
       const confettiData = props.confetti[id];
 
-      confetti({
-        angle: 180 - confettiData.angle,
-        spread: 45,
-        origin: confettiData.position,
-        startVelocity: confettiData.velocity,
-      });
+      if (props.enabled)
+        confetti({
+          angle: 180 - confettiData.angle,
+          spread: 45,
+          origin: confettiData.position,
+          startVelocity: confettiData.velocity,
+        });
     }
   }, [confettiIds, props.confetti]);
 
