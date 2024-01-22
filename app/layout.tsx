@@ -46,7 +46,6 @@ function App({ children }: PropsWithChildren) {
     <DatabaseProvider sdk={db}>
       <html lang="en">
         <head>
-          favicon
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width" />
           <title>Scrum Poker</title>

@@ -9,7 +9,6 @@ import { RoomManager } from "@/helpers/room";
 import useConfetti from "@/hooks/use-confetti";
 import useGuard from "@/hooks/use-guard";
 import { Confetti, Room } from "@/types";
-import confetti from "canvas-confetti";
 import clsx from "clsx";
 import {
   child,
@@ -44,9 +43,9 @@ function isIcon(value: string | number | null): value is string {
   return typeof value === "string" && value.startsWith("i-ph");
 }
 
-function renderVote(value: string | number | null, size = "text-lg") {
+function renderVote(value: string | number | null) {
   if (isIcon(value)) {
-    return <div className={clsx(value, size)} />;
+    return <div className={clsx(value, "text-2xl")} />;
   }
 
   return value;
@@ -69,11 +68,11 @@ export default function Room({ params }: Props) {
     enabled: preferences.confetti,
   });
 
-  useGuard(
-    () => !room.data?.users || !!room.data.users[id],
-    "/join/" + params.id,
-    [id, room.data?.users, params.id],
-  );
+  useGuard(() => !room.data?.users || !!room.data.users[id], "/" + params.id, [
+    id,
+    room.data?.users,
+    params.id,
+  ]);
 
   useEffect(() => {
     const connectedRef = ref(db, ".info/connected");
@@ -89,29 +88,29 @@ export default function Room({ params }: Props) {
     });
   }, [db, id, params.id]);
 
-  useEffect(() => {
-    if (!preferences.confetti) return;
+  // useEffect(() => {
+  //   if (!preferences.confetti) return;
 
-    return onValue(child(roomRef, "show"), (snap) => {
-      if (!snap.exists() || !snap.val()) return;
+  //   return onValue(child(roomRef, "show"), (snap) => {
+  //     if (!snap.exists() || !snap.val()) return;
 
-      const groupId = room.data?.users?.[id]?.group;
-      const group = room.data?.groups?.[groupId];
+  //     const groupId = room.data?.users?.[id]?.group;
+  //     const group = room.data?.groups?.[groupId];
 
-      if (!group) return;
+  //     if (!group) return;
 
-      const votes = Object.values(room.data?.users ?? {})
-        .filter((x) => x.group === groupId && x.isOnline)
-        .map((x) => x.vote);
+  //     const votes = Object.values(room.data?.users ?? {})
+  //       .filter((x) => x.group === groupId && x.isOnline)
+  //       .map((x) => x.vote);
 
-      if (votes.every((x) => x === votes[0])) {
-        confetti({
-          particleCount: 200,
-        });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.data?.users?.[id]?.group, id, preferences.confetti]);
+  //     if (votes.every((x) => x === votes[0])) {
+  //       confetti({
+  //         particleCount: 200,
+  //       });
+  //     }
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [room.data?.users?.[id]?.group, id, preferences.confetti]);
 
   const getTitle = useCallback(() => {
     if (!manager.owner) {
@@ -158,7 +157,8 @@ export default function Room({ params }: Props) {
             </Link>
             <h1 className="title text">{getTitle()}</h1>
 
-            {!!navigator.clipboard?.writeText ? (
+            {typeof navigator !== "undefined" &&
+            !!navigator.clipboard?.writeText ? (
               <button
                 className="ms-4 flex flex-row text-xs text-gray-600 dark:text-gray-400"
                 onClick={() => {
@@ -207,7 +207,7 @@ export default function Room({ params }: Props) {
                 onClick={() => manager.getUserManager(id).setVote(value)}
                 disabled={loading}
               >
-                {renderVote(value, "text-2xl")}
+                {renderVote(value)}
               </button>
             </div>
           ))}
@@ -252,7 +252,7 @@ export default function Room({ params }: Props) {
                   className="title text"
                 />
 
-                {group.id !== user.group ? (
+                {group.id !== user?.group ? (
                   <button
                     className="ms-2 h[2rem] w[4rem] text-sm"
                     onClick={() =>
@@ -262,7 +262,7 @@ export default function Room({ params }: Props) {
                     Join
                   </button>
                 ) : null}
-                {user.isOwner && group.id !== "default" ? (
+                {user?.isOwner && group.id !== "default" ? (
                   <ButtonWithConfirm
                     className="ms-2 h[2rem] w[5rem] text-sm"
                     text="Delete"
