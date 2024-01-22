@@ -195,22 +195,27 @@ export default function Room({ params }: Props) {
           </div>
         </div>
         <section className="flex flex-row justify-center mt-16">
-          {numbers.map((value) => (
-            <div key={value}>
-              <button
-                className={clsx(
-                  "btn h[6rem] w[6rem] me-2 position-relative transform-gpu flex justify-center items-center",
-                  "hover:scale-125 duration-150 delay-0",
-                  "hover:ms-4 hover:me-6 transition-all",
-                  styles.button,
-                )}
-                onClick={() => manager.getUserManager(id).setVote(value)}
-                disabled={loading}
-              >
-                {renderVote(value)}
-              </button>
-            </div>
-          ))}
+          {numbers.map((value) => {
+            const selected = user?.vote === value;
+
+            return (
+              <div key={value}>
+                <button
+                  className={clsx(
+                    "btn h[6rem] w[6rem] me-2 position-relative transform-gpu flex justify-center items-center",
+                    "hover:scale-125 duration-150 delay-0",
+                    "hover:ms-4 hover:me-6 transition-all",
+                    selected && "bg-blue-700",
+                    styles.button,
+                  )}
+                  onClick={() => manager.getUserManager(id).setVote(value)}
+                  disabled={loading}
+                >
+                  {renderVote(value)}
+                </button>
+              </div>
+            );
+          })}
         </section>
       </div>
 
