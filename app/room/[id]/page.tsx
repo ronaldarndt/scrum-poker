@@ -23,10 +23,11 @@ import Link from "next/link";
 import { Fragment, useCallback, useEffect } from "react";
 import { useDatabase, useDatabaseObjectData } from "reactfire";
 import styles from "./page.module.css";
-
 import { preferencesAtom } from "@/atoms/preferences";
 import PreferencesButton from "@/components/preferences-button/preferences-button";
 import { Toaster, toast } from "react-hot-toast";
+
+export const runtime = 'edge';
 
 interface Props {
   params: { id: string };
