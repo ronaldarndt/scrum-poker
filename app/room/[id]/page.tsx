@@ -1,8 +1,10 @@
 "use client";
 
+import { preferencesAtom } from "@/atoms/preferences";
 import { userAtom } from "@/atoms/user";
 import ButtonWithConfirm from "@/components/button-with-confirm";
 import EditableText from "@/components/editable-text";
+import PreferencesButton from "@/components/preferences-button/preferences-button";
 import { useRefs } from "@/database";
 import { fib } from "@/helpers/number";
 import { RoomManager } from "@/helpers/room";
@@ -21,13 +23,11 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import Link from "next/link";
 import { Fragment, useCallback, useEffect } from "react";
+import { Toaster, toast } from "react-hot-toast";
 import { useDatabase, useDatabaseObjectData } from "reactfire";
 import styles from "./page.module.css";
-import { preferencesAtom } from "@/atoms/preferences";
-import PreferencesButton from "@/components/preferences-button/preferences-button";
-import { Toaster, toast } from "react-hot-toast";
 
-export const runtime = 'edge';
+export const runtime = "edge";
 
 interface Props {
   params: { id: string };
@@ -52,7 +52,7 @@ function renderVote(value: string | number | null) {
   return value;
 }
 
-export default function Room({ params }: Props) {
+export default function RoomPage({ params }: Props) {
   const [{ id }, setUser] = useAtom(userAtom);
   const preferences = useAtomValue(preferencesAtom);
 
@@ -164,7 +164,9 @@ export default function Room({ params }: Props) {
                 className="ms-4 flex flex-row text-xs text-gray-600 dark:text-gray-400"
                 onClick={() => {
                   toast.promise(
-                    navigator.clipboard.writeText(window.location.href.replace('/room', '')),
+                    navigator.clipboard.writeText(
+                      window.location.href.replace("/room", ""),
+                    ),
                     {
                       loading: "Copying link...",
                       success: "Copied!",

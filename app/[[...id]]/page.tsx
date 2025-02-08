@@ -10,9 +10,9 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import styles from "../page.module.css";
 
-export const runtime = 'edge';
+export const runtime = "edge";
 
-export default function Home({ params }: { params: { id?: string } }) {
+export default function CatchAllPage({ params }: { params: { id?: string } }) {
   const [user, setUser] = useAtom(userAtom);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
