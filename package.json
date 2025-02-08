@@ -26,8 +26,6 @@
   },
   "devDependencies": {
     "@iconify-json/ph": "^1.1.9",
-    "@swc-jotai/debug-label": "^0.1.0",
-    "@swc-jotai/react-refresh": "^0.1.0",
     "@types/canvas-confetti": "^1.6.4",
     "@types/node": "^20",
     "@types/react": "^18",
