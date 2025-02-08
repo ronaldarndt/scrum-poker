@@ -164,7 +164,7 @@ export default function Room({ params }: Props) {
                 className="ms-4 flex flex-row text-xs text-gray-600 dark:text-gray-400"
                 onClick={() => {
                   toast.promise(
-                    navigator.clipboard.writeText(window.location.href),
+                    navigator.clipboard.writeText(window.location.href.replace('/room', '')),
                     {
                       loading: "Copying link...",
                       success: "Copied!",
