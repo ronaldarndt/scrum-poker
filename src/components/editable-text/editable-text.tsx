@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { Ref, forwardRef, useRef, useState } from "react";
+import { useRef, useState, type RefObject } from "react";
+import { LuPencil } from "react-icons/lu";
 import { mergeRefs } from "react-merge-refs";
 
 interface WrapperProps {
@@ -8,7 +9,7 @@ interface WrapperProps {
   onClick: (event: React.MouseEvent<HTMLInputElement>) => unknown;
   onMouseDown: (event: React.MouseEvent<HTMLInputElement>) => unknown;
   className?: string;
-  ref?: Ref<HTMLDivElement>;
+  ref?: RefObject<HTMLDivElement>;
 }
 
 interface Props {
@@ -16,9 +17,10 @@ interface Props {
   value: string;
   onChange: (value: string) => unknown;
   wrapper: (props: WrapperProps) => React.ReactNode;
+  ref?: RefObject<HTMLInputElement>;
 }
 
-function EditableText(props: Props, ref: Ref<HTMLInputElement>) {
+export default function EditableText(props: Props) {
   const [editing, setEditing] = useState(false);
 
   const localRef = useRef<HTMLInputElement>(null);
@@ -44,7 +46,7 @@ function EditableText(props: Props, ref: Ref<HTMLInputElement>) {
           handleChange(e.currentTarget.value);
         }
       }}
-      ref={mergeRefs([ref, localRef])}
+      ref={mergeRefs([props.ref, localRef])}
     />
   ) : (
     <props.wrapper
@@ -60,13 +62,11 @@ function EditableText(props: Props, ref: Ref<HTMLInputElement>) {
         }, 0);
         return false;
       }}
-      className={clsx(props.className, "flex flex-row items-center")}
-      ref={ref}
+      className={clsx(props.className, "flex flex-row items-center gap-1")}
+      ref={props.ref}
     >
       {props.value}
-      <i className="i-ph-pencil-simple text-base ms-1" />
+      <LuPencil />
     </props.wrapper>
   );
 }
-
-export default forwardRef(EditableText);

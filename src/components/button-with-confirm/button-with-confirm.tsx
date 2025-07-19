@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ForwardedRef, forwardRef, useRef, useState } from "react";
+import { useRef, useState, type RefObject } from "react";
 import { mergeRefs } from "react-merge-refs";
 import { useOnClickOutside } from "usehooks-ts";
 
@@ -9,14 +9,15 @@ interface Props {
   confirmClass?: string;
   onConfirm: () => unknown;
   className?: string;
+  ref?: RefObject<HTMLButtonElement>;
 }
 
-function ButtonWithConfirm(props: Props, ref: ForwardedRef<HTMLButtonElement>) {
+export default function ButtonWithConfirm(props: Props) {
   const [clickedOnce, setClickedOnce] = useState(false);
 
   const localRef = useRef<HTMLButtonElement>(null);
 
-  useOnClickOutside(localRef, () => {
+  useOnClickOutside(localRef as RefObject<HTMLButtonElement>, () => {
     setClickedOnce(false);
   });
 
@@ -31,12 +32,10 @@ function ButtonWithConfirm(props: Props, ref: ForwardedRef<HTMLButtonElement>) {
   return (
     <button
       onClick={handleClick}
-      ref={mergeRefs([localRef, ref])}
+      ref={mergeRefs([localRef, props.ref])}
       className={clsx(props.className, clickedOnce && props.confirmClass)}
     >
       {clickedOnce ? props.confirmText : props.text}
     </button>
   );
 }
-
-export default forwardRef(ButtonWithConfirm);

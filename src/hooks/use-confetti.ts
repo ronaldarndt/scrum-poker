@@ -1,8 +1,10 @@
-import { Confetti } from "@/types";
 import confetti from "canvas-confetti";
 import { nanoid } from "nanoid";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { type Confetti } from "../types";
+
+const CANVAS_ID = "canvas_confetti";
 
 interface Props {
   onLaunch: (ctx: Confetti) => void;
@@ -11,7 +13,7 @@ interface Props {
 }
 
 export default function useConfetti(props: Props) {
-  const [, setIsLaunching] = useState(false);
+  const isLaunching = useRef(false);
 
   const renderedConfetti = useRef<string[]>([]);
 
@@ -20,10 +22,9 @@ export default function useConfetti(props: Props) {
   useHotkeys(
     "a",
     () => {
-      setIsLaunching((l) => {
-        if (!l) initDraw();
-        return true;
-      });
+      if (isLaunching.current) return;
+      isLaunching.current = true;
+      initDraw();
     },
     { keydown: true, keyup: false },
   );
@@ -31,10 +32,10 @@ export default function useConfetti(props: Props) {
   useHotkeys(
     "esc",
     () => {
-      setIsLaunching(false);
-      document.querySelector("#cnvTest")?.remove();
+      isLaunching.current = false;
+      document.querySelector("#" + CANVAS_ID)?.remove();
     },
-    { keydown: true, keyup: false },
+    { keydown: true, keyup: true },
   );
 
   useEffect(() => {
@@ -50,19 +51,22 @@ export default function useConfetti(props: Props) {
 
       const confettiData = props.confetti[id];
 
-      if (props.enabled)
+      if (props.enabled) {
+        console.log(confettiData.position);
+
         confetti({
           angle: 180 - confettiData.angle,
           spread: 45,
           origin: confettiData.position,
           startVelocity: confettiData.velocity,
         });
+      }
     }
   }, [confettiIds, props.confetti]);
 
   function initDraw() {
     const canvas = document.createElement("canvas");
-    canvas.id = "cnvTest";
+    canvas.id = CANVAS_ID;
     canvas.style.position = "fixed";
     canvas.style.top = "0";
     canvas.style.left = "0";

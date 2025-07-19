@@ -1,14 +1,17 @@
-import { DatabaseReference, child, ref } from "firebase/database";
-import { useDatabase } from "reactfire";
+import {
+  child,
+  getDatabase,
+  ref,
+  type DatabaseReference,
+} from "firebase/database";
+import { app } from "./lib/firebase";
 
-export function useRefs() {
-  const db = useDatabase();
+const db = getDatabase(app);
 
-  return {
-    rooms: ref(db, "rooms"),
-    room: (id: string) => ref(db, `rooms/${id}`),
-    roomUsers: (roomId: string) => ref(db, `rooms/${roomId}/users`),
-    roomUser: (room: DatabaseReference, userId: string) =>
-      child(room, `users/${userId}`),
-  };
-}
+export const refs = {
+  rooms: ref(db, "rooms"),
+  room: (id: string) => ref(db, `rooms/${id}`),
+  roomUsers: (roomId: string) => ref(db, `rooms/${roomId}/users`),
+  roomUser: (room: DatabaseReference, userId: string) =>
+    child(room, `users/${userId}`),
+};

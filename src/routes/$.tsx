@@ -1,34 +1,30 @@
-"use client";
-
-import { userAtom } from "@/atoms/user";
-import { useRefs } from "@/database";
+import { createFileRoute } from "@tanstack/react-router";
 import { set } from "firebase/database";
-import { useAtom } from "jotai";
 import { nanoid } from "nanoid";
-import Head from "next/head";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import styles from "../page.module.css";
+import { useState, type FormEvent } from "react";
+import { refs } from "../database";
+import { useUserStore } from "../stores/user-store";
 
-export const runtime = "edge";
+export const Route = createFileRoute("/$")({
+  component: RouteComponent,
+});
 
-export default function CatchAllPage({ params }: { params: { id?: string } }) {
-  const [user, setUser] = useAtom(userAtom);
+function RouteComponent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const user = useUserStore();
 
-  const { room: getRoomRef, roomUser } = useRefs();
+  const { _splat } = Route.useParams();
+  const navigate = Route.useNavigate();
 
-  const router = useRouter();
-
-  const isCreate = !params.id;
+  const isCreate = !_splat;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const username = (
-      e.currentTarget.elements.namedItem("username") as HTMLInputElement
-    )?.value;
+    const formData = new FormData(e.currentTarget);
+
+    const username = formData.get("username") as string;
 
     if (!username && !user.name) {
       setError("Username is required");
@@ -39,9 +35,9 @@ export default function CatchAllPage({ params }: { params: { id?: string } }) {
 
     const name = username || user.name;
 
-    const id = !params.id ? nanoid() : params.id;
+    const id = !_splat ? nanoid() : _splat;
 
-    const room = getRoomRef(id);
+    const room = refs.room(id);
 
     if (isCreate) {
       await set(room, {
@@ -67,7 +63,7 @@ export default function CatchAllPage({ params }: { params: { id?: string } }) {
         },
       });
     } else {
-      await set(roomUser(room, user.id), {
+      await set(refs.roomUser(room, user.id), {
         id: user.id,
         name,
         isOwner: false,
@@ -77,29 +73,33 @@ export default function CatchAllPage({ params }: { params: { id?: string } }) {
       });
     }
 
-    setUser((u) => ({ ...u, name: username }));
+    user.set((u) => ({ ...u, name }));
 
-    router.push("/room/" + id);
+    navigate({
+      to: "/room/$id",
+      params: { id },
+    });
   }
 
   const title = isCreate ? "Create room" : "Join room";
 
   return (
-    <main className={styles.main}>
-      <Head>
-        <title key="title">{title}</title>
-      </Head>
+    <main className="font-sans bg-paper h-full flex-col flex items-center justify-center p-16">
+      <title key="title">{title}</title>
 
-      <h1 className="title mb-10 text">{title}</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col">
+      <h1 className="mb-10">{title}</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col bg-paper-light p-8 rounded-lg shadow-md"
+      >
         {user.name ? (
-          <p className="text">Logged in as {user.name}</p>
+          <p>Logged in as {user.name}</p>
         ) : (
           <input
             type="text"
             placeholder="Username"
             name="username"
-            className="text"
+            className="mb-4 p-2 border border-gray-300 rounded-lg"
           />
         )}
 
@@ -107,7 +107,7 @@ export default function CatchAllPage({ params }: { params: { id?: string } }) {
 
         <button
           type="submit"
-          className="btn mt-2 flex justify-center align-center text"
+          className="mt-2 flex justify-center align-center text rounded-lg bg-gray-800 hover:bg-gray-700 cursor-pointer transition-colors text-white px-4 py-2"
           disabled={loading}
         >
           {loading ? (

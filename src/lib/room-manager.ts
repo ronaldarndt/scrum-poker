@@ -1,6 +1,5 @@
-import { Room } from "@/types";
 import {
-  DatabaseReference,
+  type DatabaseReference,
   child,
   remove,
   serverTimestamp,
@@ -8,6 +7,7 @@ import {
   update,
 } from "firebase/database";
 import { nanoid } from "nanoid";
+import { type Room } from "../types";
 
 export class RoomManager {
   constructor(
@@ -24,7 +24,7 @@ export class RoomManager {
   }
 
   public getUserManager(id: string) {
-    return new UserManager(this.room, this.getUser(id), this.ref);
+    return new UserManager(this.getUser(id), this.ref);
   }
 
   public toggleShow() {
@@ -64,13 +64,12 @@ export class RoomManager {
   }
 
   public getGroupManager(id: string) {
-    return new GroupManager(this.room, this.getGroup(id), this.ref);
+    return new GroupManager(this.getGroup(id), this.ref);
   }
 }
 
 class UserManager {
   constructor(
-    private room: Room | undefined,
     private user: Room["users"][string] | undefined,
     private roomRef: DatabaseReference,
   ) {}
@@ -97,7 +96,6 @@ class UserManager {
 
 class GroupManager {
   constructor(
-    private room: Room | undefined,
     private group: Room["groups"][string] | undefined,
     private roomRef: DatabaseReference,
   ) {}
