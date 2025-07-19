@@ -8,70 +8,70 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as SplatRouteImport } from "./routes/$";
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as RoomIdRouteImport } from "./routes/room/$id";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as RoomIdRouteImport } from './routes/room/$id'
 
 const SplatRoute = SplatRouteImport.update({
-  id: "/$",
-  path: "/$",
+  id: '/$',
+  path: '/$',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const RoomIdRoute = RoomIdRouteImport.update({
-  id: "/room/$id",
-  path: "/room/$id",
+  id: '/room/$id',
+  path: '/room/$id',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/$": typeof SplatRoute;
-  "/room/$id": typeof RoomIdRoute;
+  '/$': typeof SplatRoute
+  '/room/$id': typeof RoomIdRoute
 }
 export interface FileRoutesByTo {
-  "/$": typeof SplatRoute;
-  "/room/$id": typeof RoomIdRoute;
+  '/$': typeof SplatRoute
+  '/room/$id': typeof RoomIdRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/$": typeof SplatRoute;
-  "/room/$id": typeof RoomIdRoute;
+  __root__: typeof rootRouteImport
+  '/$': typeof SplatRoute
+  '/room/$id': typeof RoomIdRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/$" | "/room/$id";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/$" | "/room/$id";
-  id: "__root__" | "/$" | "/room/$id";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/$' | '/room/$id'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/$' | '/room/$id'
+  id: '__root__' | '/$' | '/room/$id'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  SplatRoute: typeof SplatRoute;
-  RoomIdRoute: typeof RoomIdRoute;
+  SplatRoute: typeof SplatRoute
+  RoomIdRoute: typeof RoomIdRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/$": {
-      id: "/$";
-      path: "/$";
-      fullPath: "/$";
-      preLoaderRoute: typeof SplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/room/$id": {
-      id: "/room/$id";
-      path: "/room/$id";
-      fullPath: "/room/$id";
-      preLoaderRoute: typeof RoomIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/room/$id': {
+      id: '/room/$id'
+      path: '/room/$id'
+      fullPath: '/room/$id'
+      preLoaderRoute: typeof RoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   RoomIdRoute: RoomIdRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
