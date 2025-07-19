@@ -99,6 +99,7 @@ function RouteComponent() {
             type="text"
             placeholder="Username"
             name="username"
+            autoComplete="username"
             className="mb-4 p-2 border border-gray-300 rounded-lg"
           />
         )}
